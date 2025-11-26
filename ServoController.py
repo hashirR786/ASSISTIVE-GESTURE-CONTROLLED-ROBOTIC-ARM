@@ -30,23 +30,23 @@ class ServoController(Node):
             self.kit.servo[ch].actuation_range = 180
             self.kit.servo[ch].set_pulse_width_range(500, 2400)
 
-        # ---- SAFE ANGLE LIMITS (REAL MOVEMENT NOW) ----
+        # ---- SAFE ANGLE LIMITS ----
         self.safe = {
             0: (60, 120),   # base rotation
-            1: (50, 70),    # shoulder
-            2: (50, 70),    # elbow
+            1: (20, 70),    # shoulder
+            2: (20, 70),    # elbow
             3: (0, 180),    # forearm rotation
             4: (40, 140),   # wrist
             5: (30, 110),   # gripper
         }
 
-        # Smoothing buffer
+        # Previous angles for smoothing
         self.old = [90] * 6
 
-        # Minimum difference needed to move
+        # Must change angle at least this much to move
         self.delta_threshold = 3
 
-        self.get_logger().info("Servo controller started")
+        self.get_logger().info("🔥 Servo controller started")
 
     # -----------------------------
     def limit_angle(self, ch, angle):
@@ -61,7 +61,7 @@ class ServoController(Node):
             self.get_logger().warn("Invalid angle array")
             return
 
-        # Input from Mac
+        # Incoming values from Mac
         shoulder = angles[0]
         elbow    = angles[1]
         forearm  = angles[2]
@@ -69,7 +69,7 @@ class ServoController(Node):
         grip_raw = angles[4]
         base     = angles[5]
 
-        # Grip (1 = closed, 0 = open)
+        # Grip mapping
         grip_angle = 45 if grip_raw == 1 else 135
 
         new_vals = [
@@ -82,13 +82,49 @@ class ServoController(Node):
         ]
 
         final_angles = []
-        alpha = 0.25  # smoothing
+        alpha = 0.25  # smoothing factor
 
         for ch in range(6):
             new_val = self.limit_angle(ch, new_vals[ch])
 
-            # Only move if angle changes enough
+            # Ignore tiny changes
             if abs(new_val - self.old[ch]) < self.delta_threshold:
                 new_val = self.old[ch]
 
             # Smoothing
+            smoothed = (1 - alpha) * self.old[ch] + alpha * new_val
+
+            self.old[ch] = smoothed
+            final_angles.append(smoothed)
+
+        # Send to servos
+        try:
+            for i in range(6):
+                self.kit.servo[i].angle = final_angles[i]
+        except Exception as e:
+            self.get_logger().error(f"Servo error: {e}")
+
+# ------------------------------------------------------------
+
+def main():
+    rclpy.init()
+    node = ServoController()
+
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+
+    print("\n⚠️ Killing all servos...")
+    for ch in range(6):
+        try:
+            node.kit.servo[ch].angle = None
+        except:
+            pass
+    print("Servos disabled safely.")
+
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
