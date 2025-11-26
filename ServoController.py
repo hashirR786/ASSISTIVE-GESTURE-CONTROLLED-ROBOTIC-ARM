@@ -46,7 +46,7 @@ class ServoController(Node):
         # Must change angle at least this much to move
         self.delta_threshold = 3
 
-        self.get_logger().info("🔥 Servo controller started")
+        self.get_logger().info("Servo controller started")
 
     # -----------------------------
     def limit_angle(self, ch, angle):
@@ -115,7 +115,7 @@ def main():
     except KeyboardInterrupt:
         pass
 
-    print("\n⚠️ Killing all servos...")
+    print("\n Killing all servos...")
     for ch in range(6):
         try:
             node.kit.servo[ch].angle = None
