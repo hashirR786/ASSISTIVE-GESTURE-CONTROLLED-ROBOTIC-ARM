@@ -1,43 +1,59 @@
-# ASSISTIVE-GESTURE-CONTROLLED-ROBOTIC-ARM
-A ROS2-based robotic arm project that allows gesture-controlled movements via UDP commands. The arm uses servo motors (MG996R and MG90S) driven by a PCA9685 controller and can perform precise movements in real-time.
+# 🤖 ASSISTIVE-GESTURE-CONTROLLED-ROBOTIC-ARM
 
-**📌Features**
+> A ROS2-based 6-DOF robotic arm that performs real-time gesture-controlled movements via UDP communication.
 
-->Real-time gesture control via UDP.
-->ROS2 nodes for modular design:
+---
 
-  **udp_receiver**: Receives gesture commands over UDP.
-  
-  **servo_controller**: Controls the robotic arm servos.
-  
-->Servo smoothing to avoid abrupt movements.
+## 📌 Overview
 
-->Safe angle limits to prevent mechanical damage.
+This project enables **gesture-based robotic control** using:
+- **ROS2 modular nodes**
+- **UDP communication**
+- **PCA9685 servo driver**
+- **MG996R & MG90S servo motors**
 
-->Works with 6 DOF robotic arms (base, shoulder, elbow, forearm, wrist, gripper).
+---
 
-**Hardware Requirements**
+## ✨ Features
 
-->Robotic arm with 6 DOF
+- ✅ **Real-time gesture control via UDP**
+- ✅ **Modular ROS2 architecture**
+- ✅ **Servo smoothing algorithm**
+- ✅ **Safe angle constraints**
+- ✅ **6 DOF joint control**
 
-->Servos:
+---
 
-  ->MG996R: Base, shoulder, elbow
-  
-  ->MG90S: Forearm, wrist, gripper
-  
-->PCA9685 16-channel servo driver
+## 🧠 ROS2 Nodes
 
-->Raspberry Pi / Jetson / Microcontroller with ROS2 support
+### 🔹 `udp_receiver`
+**Purpose:** Receives gesture commands over UDP.
 
-->Power supply suitable for servos
+- Listens on UDP port
+- Parses incoming data
+- Publishes to ROS2 topic
 
-**Software Requirements**
+---
 
-->ROS2 (tested on Humble / Foxy)
+### 🔹 `servo_controller`
+**Purpose:** Controls servo motors.
 
-->Python 3.8+
+- Subscribes to gesture topic
+- Applies smoothing
+- Enforces angle limits
+- Sends PWM signals via PCA9685
 
-->rclpy ROS2 Python client library
-->adafruit-circuitpython-servokit
-->std_msgs ROS2 package
+---
+
+## 🏗 System Architecture
+
+```text
+Gesture Input
+      ↓ (UDP)
+udp_receiver
+      ↓ (ROS2 Topic)
+servo_controller
+      ↓ (I2C)
+PCA9685 Driver
+      ↓
+Servo Motors
