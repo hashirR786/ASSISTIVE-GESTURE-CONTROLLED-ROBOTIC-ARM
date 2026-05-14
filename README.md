@@ -1,3 +1,5 @@
+<img width="904" height="1280" alt="WhatsApp Image 2026-05-14 at 12 11 40 PM" src="https://github.com/user-attachments/assets/ae71c4b3-d7bf-4b6a-a6a8-49daaaa25881" />
+
 # 🤖 ASSISTIVE-GESTURE-CONTROLLED-ROBOTIC-ARM
 
 > A ROS2-based 6-DOF robotic arm that performs real-time gesture-controlled movements via UDP communication.
